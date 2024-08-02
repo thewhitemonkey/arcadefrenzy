@@ -104,6 +104,35 @@
                 transform: translateX(100%) rotate(45deg);
             }
         }
+        .laser-bg::before, .laser-bg::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, 
+        rgba(255, 0, 0, 0.8), 
+        rgba(255, 127, 0, 0.8),
+        rgba(255, 255, 0, 0.8),
+        rgba(0, 255, 0, 0.8),
+        rgba(0, 0, 255, 0.8),
+        rgba(75, 0, 130, 0.8),
+        rgba(148, 0, 211, 0.8),
+        rgba(255, 0, 0, 0.8) /* Loop back to the start color */
+    );
+    background-size: 1000% 1000%; /* Make gradient transitions smoother */
+    animation: laserAnimation 10s linear infinite; /* Increased animation duration */
+}
+@keyframes laserAnimation {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
+}
+
     </style>
 </head>
 <body>
