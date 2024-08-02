@@ -92,9 +92,18 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, rgba(255, 0, 0, 0.8), rgba(0, 255, 0, 0.8), rgba(0, 0, 255, 0.8));
-            background-size: 200% 200%;
-            animation: laserAnimation 5s linear infinite;
+            background: linear-gradient(45deg, 
+                rgba(255, 0, 0, 0.8), 
+                rgba(255, 127, 0, 0.8),
+                rgba(255, 255, 0, 0.8),
+                rgba(0, 255, 0, 0.8),
+                rgba(0, 0, 255, 0.8),
+                rgba(75, 0, 130, 0.8),
+                rgba(148, 0, 211, 0.8),
+                rgba(255, 0, 0, 0.8) /* Loop back to the start color */
+            );
+            background-size: 1000% 1000%; /* Make gradient transitions smoother */
+            animation: laserAnimation 10s linear infinite; /* Increased animation duration */
         }
         @keyframes laserAnimation {
             0% {
@@ -104,38 +113,21 @@
                 transform: translateX(100%) rotate(45deg);
             }
         }
-        .laser-bg::before, .laser-bg::after {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, 
-        rgba(255, 0, 0, 0.8), 
-        rgba(255, 127, 0, 0.8),
-        rgba(255, 255, 0, 0.8),
-        rgba(0, 255, 0, 0.8),
-        rgba(0, 0, 255, 0.8),
-        rgba(75, 0, 130, 0.8),
-        rgba(148, 0, 211, 0.8),
-        rgba(255, 0, 0, 0.8) /* Loop back to the start color */
-    );
-    background-size: 1000% 1000%; /* Make gradient transitions smoother */
-    animation: laserAnimation 10s linear infinite; /* Increased animation duration */
-}
-@keyframes laserAnimation {
-    0% {
-        transform: translateX(-100%) rotate(45deg);
-    }
-    100% {
-        transform: translateX(100%) rotate(45deg);
-    }
-}
-
+        
+        /* Canvas Styling */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Ensure canvas is behind the laser background */
+            pointer-events: none; /* Prevents canvas from capturing mouse events */
+        }
     </style>
 </head>
 <body>
+    <canvas id="fireworksCanvas"></canvas>
     <div class="laser-bg"></div>
     <h1>GAMES</h1>
     <a href="./play/snowrider/" class="game-link">
@@ -150,8 +142,84 @@
         <img src="./play/basket-bros/basketbros.jpeg" alt="Basket Bros">
         <span>Basket Bros</span>
     </a>
+    <script>
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+
+        function createFirework(x, y) {
+            const colors = ['#ff0044', '#ff7700', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const count = 100;
+            const speed = 3;
+            const spread = 5;
+            
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.random() * speed - speed / 2,
+                    vy: Math.random() * speed - speed / 2,
+                    size: Math.random() * 3 + 1,
+                    life: Math.random() * 30 + 30,
+                    color: color
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        function drawParticles() {
+            for (const p of particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateParticles();
+            drawParticles();
+            requestAnimationFrame(animate);
+        }
+
+        function spawnFireworks() {
+            const interval = 1000; // Fireworks every 1 second
+            setInterval(() => {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                createFirework(x, y);
+            }, interval);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        animate();
+        spawnFireworks();
+    </script>
 </body>
 </html>
+
 
 
 
