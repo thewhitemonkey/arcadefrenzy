@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade Frenzy</title>
+    <style>
+        /* Basic Reset */
+        body, h1, a {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* Full Height */
+        html, body {
+            height: 100%;
+        }
+        /* Centered Content */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial', sans-serif;
+            background: #282c34;
+            color: #61dafb;
+            text-align: center;
+            padding: 20px;
+        }
+        /* Title Styling */
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            color: #61dafb;
+        }
+        /* Link Styling */
+        .game-link {
+            display: block;
+            font-size: 1.75rem;
+            margin: 15px 0;
+            text-decoration: none;
+            color: #ffffff;
+            padding: 15px 30px;
+            border-radius: 10px;
+            background: #61dafb;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+        .game-link img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+        }
+        .game-link:hover {
+            background: #21a1f1;
+            transform: translateY(-4px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .game-link:active {
+            transform: translateY(2px);
+        }
+        .game-link span {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>GAMES</h1>
+    <a href="./play/snowrider/" class="game-link">
+        <img src="./play/snowrider/snowrider.jpeg" alt="Snow Rider 3D">
+        <span>Snow Rider 3D</span>
+    </a>
+    <a href="./play/slope/" class="game-link">
+        <img src="./play/slope/slope.jpg" alt="Slope">
+        <span>Slope</span>
+    </a>
+    <a href="./play/basket-bros/index.html" class="game-link">
+        <img src="./play/basket-bros/basketbros.jpeg" alt="Basket Bros">
+        <span>Basket Bros</span>
+    </a>
+</body>
+</html>
+
+
