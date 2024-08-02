@@ -27,7 +27,7 @@
             text-align: center;
             padding: 20px;
             position: relative;
-            z-index: 1; /* Ensure content is on top of the laser background */
+            z-index: 1; /* Ensure content is on top of the canvas */
             background-color: #1a1a1a; /* Set the background color to dark */
         }
         /* Title Styling */
@@ -74,46 +74,6 @@
             z-index: 1;
         }
 
-        /* Laser Background Styling */
-        .laser-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 50%);
-            overflow: hidden;
-            z-index: 0;
-        }
-        .laser-bg::before, .laser-bg::after {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, 
-                rgba(255, 0, 0, 0.8), 
-                rgba(255, 127, 0, 0.8),
-                rgba(255, 255, 0, 0.8),
-                rgba(0, 255, 0, 0.8),
-                rgba(0, 0, 255, 0.8),
-                rgba(75, 0, 130, 0.8),
-                rgba(148, 0, 211, 0.8),
-                rgba(255, 0, 0, 0.8) /* Loop back to the start color */
-            );
-            background-size: 1000% 1000%; /* Make gradient transitions smoother */
-            animation: laserAnimation 10s linear infinite; /* Increased animation duration */
-        }
-        @keyframes laserAnimation {
-            0% {
-                transform: translateX(-100%) rotate(45deg);
-            }
-            100% {
-                transform: translateX(100%) rotate(45deg);
-            }
-        }
-        
         /* Canvas Styling */
         canvas {
             position: absolute;
@@ -121,23 +81,21 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0; /* Ensure canvas is behind the laser background */
+            z-index: 0; /* Ensure canvas is behind the content */
             pointer-events: none; /* Prevents canvas from capturing mouse events */
         }
         /* Balloon Styling */
-.balloon {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #ffffff, #ff0000);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
-    opacity: 0.8;
-}
-
+        .balloon {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #ff0000);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
     <canvas id="fireworksCanvas"></canvas>
-    <div class="laser-bg"></div>
     <h1>GAMES</h1>
     <a href="./play/snowrider/" class="game-link">
         <img src="./play/snowrider/snowrider.jpeg" alt="Snow Rider 3D">
@@ -153,139 +111,140 @@
     </a>
     <script>
         const canvas = document.getElementById('fireworksCanvas');
-const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-let particles = [];
-let balloons = [];
+        let particles = [];
+        let balloons = [];
 
-function createFirework(x, y) {
-    const colors = ['#ff0044', '#ff7700', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    const count = 100;
-    const speed = 3;
-    
-    for (let i = 0; i < count; i++) {
-        particles.push({
-            x: x,
-            y: y,
-            vx: Math.random() * speed - speed / 2,
-            vy: Math.random() * speed - speed / 2,
-            size: Math.random() * 3 + 1,
-            life: Math.random() * 30 + 30,
-            color: color
+        function createFirework(x, y) {
+            const colors = ['#ff0044', '#ff7700', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const count = 100;
+            const speed = 3;
+            
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.random() * speed - speed / 2,
+                    vy: Math.random() * speed - speed / 2,
+                    size: Math.random() * 3 + 1,
+                    life: Math.random() * 30 + 30,
+                    color: color
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        function drawParticles() {
+            for (const p of particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
+            }
+        }
+
+        function createBalloon(x, y) {
+            const colors = ['#ff0044', '#ff7700', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const size = Math.random() * 30 + 20;
+            balloons.push({
+                x: x,
+                y: y,
+                vx: Math.random() * 2 - 1,
+                vy: Math.random() * 2 - 1,
+                size: size,
+                color: color
+            });
+        }
+
+        function updateBalloons() {
+            for (let i = 0; i < balloons.length; i++) {
+                const b = balloons[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                
+                // Make balloons rise
+                b.y -= 0.5;
+                
+                // Randomize motion slightly
+                b.vx += (Math.random() - 0.5) * 0.2;
+                b.vy += (Math.random() - 0.5) * 0.2;
+                
+                // Remove balloon if it goes out of view
+                if (b.y < -b.size || b.x < -b.size || b.x > canvas.width + b.size) {
+                    balloons.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        function drawBalloons() {
+            for (const b of balloons) {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateParticles();
+            drawParticles();
+            updateBalloons();
+            drawBalloons();
+            requestAnimationFrame(animate);
+        }
+
+        function spawnFireworks() {
+            const interval = 1000; // Fireworks every 1 second
+            setInterval(() => {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                createFirework(x, y);
+            }, interval);
+        }
+
+        function spawnBalloons() {
+            const interval = 1500; // Balloons every 1.5 seconds
+            setInterval(() => {
+                const x = Math.random() * canvas.width;
+                const y = canvas.height; // Start from bottom
+                createBalloon(x, y);
+            }, interval);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         });
-    }
-}
 
-function updateParticles() {
-    for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life--;
-        if (p.life <= 0) {
-            particles.splice(i, 1);
-            i--;
-        }
-    }
-}
-
-function drawParticles() {
-    for (const p of particles) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
-    }
-}
-
-function createBalloon(x, y) {
-    const colors = ['#ff0044', '#ff7700', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    
-    const size = Math.random() * 30 + 20;
-    balloons.push({
-        x: x,
-        y: y,
-        vx: Math.random() * 2 - 1,
-        vy: Math.random() * 2 - 1,
-        size: size,
-        color: color
-    });
-}
-
-function updateBalloons() {
-    for (let i = 0; i < balloons.length; i++) {
-        const b = balloons[i];
-        b.x += b.vx;
-        b.y += b.vy;
-        
-        // Make balloons rise
-        b.y -= 0.5;
-        
-        // Randomize motion slightly
-        b.vx += (Math.random() - 0.5) * 0.2;
-        b.vy += (Math.random() - 0.5) * 0.2;
-        
-        // Remove balloon if it goes out of view
-        if (b.y < -b.size || b.x < -b.size || b.x > canvas.width + b.size) {
-            balloons.splice(i, 1);
-            i--;
-        }
-    }
-}
-
-function drawBalloons() {
-    for (const b of balloons) {
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
-        ctx.fillStyle = b.color;
-        ctx.fill();
-    }
-}
-
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    updateParticles();
-    drawParticles();
-    updateBalloons();
-    drawBalloons();
-    requestAnimationFrame(animate);
-}
-
-function spawnFireworks() {
-    const interval = 1000; // Fireworks every 1 second
-    setInterval(() => {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        createFirework(x, y);
-    }, interval);
-}
-
-function spawnBalloons() {
-    const interval = 1500; // Balloons every 1.5 seconds
-    setInterval(() => {
-        const x = Math.random() * canvas.width;
-        const y = canvas.height; // Start from bottom
-        createBalloon(x, y);
-    }, interval);
-}
-
-window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-});
-
-animate();
-spawnFireworks();
-spawnBalloons();
+        animate();
+        spawnFireworks();
+        spawnBalloons();
 
     </script>
 </body>
 </html>
+
 
 
 
