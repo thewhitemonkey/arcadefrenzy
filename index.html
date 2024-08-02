@@ -92,23 +92,6 @@
             box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
             opacity: 0.8;
         }
-        /* Sign Styling */
-        .sign {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 4rem;
-            color: #ffffff;
-            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.7); /* Adds shadow for better visibility */
-            background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for contrast */
-            padding: 20px;
-            border-radius: 10px;
-        }
-        .sign span {
-            display: block;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -126,9 +109,6 @@
         <img src="./play/basket-bros/basketbros.jpeg" alt="Basket Bros">
         <span>Basket Bros</span>
     </a>
-    <div class="sign">
-        <span>Have Fun!</span>
-    </div>
     <script>
         const canvas = document.getElementById('fireworksCanvas');
         const ctx = canvas.getContext('2d');
@@ -198,6 +178,73 @@
         function updateBalloons() {
             for (let i = 0; i < balloons.length; i++) {
                 const b = balloons[i];
+                b.x += b.vx;
+                b.y += b.vy;
+                
+                // Make balloons rise
+                b.y -= 0.5;
+                
+                // Randomize motion slightly
+                b.vx += (Math.random() - 0.5) * 0.2;
+                b.vy += (Math.random() - 0.5) * 0.2;
+                
+                // Remove balloon if it goes out of view
+                if (b.y < -b.size || b.x < -b.size || b.x > canvas.width + b.size) {
+                    balloons.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
+        function drawBalloons() {
+            for (const b of balloons) {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateParticles();
+            drawParticles();
+            updateBalloons();
+            drawBalloons();
+            requestAnimationFrame(animate);
+        }
+
+        function spawnFireworks() {
+            const interval = 1000; // Fireworks every 1 second
+            setInterval(() => {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                createFirework(x, y);
+            }, interval);
+        }
+
+        function spawnBalloons() {
+            const interval = 1500; // Balloons every 1.5 seconds
+            setInterval(() => {
+                const x = Math.random() * canvas.width;
+                const y = canvas.height; // Start from bottom
+                createBalloon(x, y);
+            }, interval);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        animate();
+        spawnFireworks();
+        spawnBalloons();
+
+    </script>
+</body>
+</html>
+
                
 
 
